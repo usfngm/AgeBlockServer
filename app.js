@@ -13,7 +13,7 @@ app.use(bodyParser.json())
 var admin = require("firebase-admin");
 
 
-var serviceAccount = require("/Users/negm/Downloads/ageblock-96602-firebase-adminsdk-mf95a-142f9be495.json");
+var serviceAccount = require("./ageblock-96602-firebase-adminsdk-mf95a-142f9be495.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),

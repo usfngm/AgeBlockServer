@@ -85,24 +85,24 @@ app.post("/register", (request, response) => {
                     .then(function () {
                         response
                             .status(200)
-                            .send({ 'result': 1, 'user': user });
+                            .send({ 'user': user });
                     })
                     .catch(function (error) {
                         response
                             .status(400)
-                            .send({ 'result': 0, 'error': error });
+                            .send({ 'msg': error });
                     });
             })
             .catch(function (error) {
                 console.log("Error updating user:", error);
                 response
                     .status(400)
-                    .send({ 'result': 0, 'error': error });
+                    .send({ 'msg': error.code });
             });
     } else {
         response
             .status(400)
-            .send({ 'result': 0, "error": "Incomplete Parameters" });
+            .send({ "msg": 'missing_params' });
     }
 });
 

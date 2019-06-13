@@ -42,8 +42,21 @@ app.post("/login", (request, response) => {
                 'name': responseUser.user.displayName,
                 'email': responseUser.user.email
             }
+            var db = admin.firestore();
+            db
+                .collection("users")
+                .doc(result.uid)
+                .get()
+                .then((doc) => {
+                    response.status(200).send({ 'user': doc.data() });
+                })
+                .catch((err) => {
+                    response
+                        .status(400)
+                        .send({ "msg": 'db_err' });
+                });
             console.log("SUCCESS");
-            response.status(200).send({ 'user': result });
+
         }).catch((error) => {
             console.log("Error login:", error);
             if (error.code == 'auth/network-request-failed') {
@@ -60,6 +73,88 @@ app.post("/login", (request, response) => {
     }
     else {
         console.log("FAIL PARAMETERS");
+        response
+            .status(400)
+            .send({ "msg": 'missing_params' });
+    }
+});
+
+app.post("/getUser", (request, response) => {
+    console.log("RECIEVED REQ");
+    console.log(request.body);
+    if (request.body.user) {
+        var user = request.body.user;
+        var db = admin.firestore();
+        db
+            .collection("users")
+            .doc(user.uid)
+            .get()
+            .then((doc) => {
+                response.status(200).send({ 'user': doc.data() });
+            })
+            .catch((err) => {
+                response
+                    .status(400)
+                    .send({ "msg": 'db_err' });
+            });
+    }
+    else {
+        console.log("FAIL PARAMETERS");
+        response
+            .status(400)
+            .send({ "msg": 'missing_params' });
+    }
+});
+
+app.post("/registerElder", (request, response) => {
+    if (request.body.user) {
+        var user = request.body.user;
+        user['email'] = user.email.toLowerCase();
+        admin
+            .auth()
+            .createUser({ email: user.email, password: user.password, displayName: user.name })
+            .then(function (userRecord) {
+                var db = admin.firestore();
+                if (user.password)
+                    delete user.password;
+                user.uid = userRecord.uid;
+                db
+                    .collection("users")
+                    .doc(user.uid)
+                    .set(user)
+                    .then(function () {
+                        console.log({ 'user': user });
+                        db
+                            .collection('users')
+                            .doc(user.elder_parentID)
+                            .get()
+                            .then((doc) => {
+                                var updatedUser = doc.data();
+                                updatedUser.parent_elders.push(user.uid);
+                                db.collection('users')
+                                    .doc(updatedUser.uid)
+                                    .set(updatedUser)
+                                    .then(() => {
+                                        response
+                                            .status(200)
+                                            .send({ 'user': user });
+                                    })
+                            })
+
+                    })
+                    .catch(function (error) {
+                        response
+                            .status(400)
+                            .send({ 'msg': error });
+                    });
+            })
+            .catch(function (error) {
+                console.log("Error updating user:", error);
+                response
+                    .status(400)
+                    .send({ 'msg': error.code });
+            });
+    } else {
         response
             .status(400)
             .send({ "msg": 'missing_params' });
@@ -83,6 +178,7 @@ app.post("/register", (request, response) => {
                     .doc(user.uid)
                     .set(user)
                     .then(function () {
+                        console.log({ 'user': user });
                         response
                             .status(200)
                             .send({ 'user': user });

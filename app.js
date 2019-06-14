@@ -94,7 +94,9 @@ app.post("/currentRequests", (request, response) => {
                 .get()
                 .then((results) => {
                     for (var i = 0; i < results.size; i++) {
-                        result.push(results.docs[i].data());
+                        var obj = results.docs[i].data();
+                        obj.uid = results.docs[i].id;
+                        result.push(obj);
                     }
                     response
                         .status(200)
@@ -114,7 +116,9 @@ app.post("/currentRequests", (request, response) => {
                 .get()
                 .then((results) => {
                     for (var i = 0; i < results.size; i++) {
-                        result.push(results.docs[i].data());
+                        var obj = results.docs[i].data();
+                        obj.uid = results.docs[i].id;
+                        result.push(obj);
                     }
                     response
                         .status(200)
@@ -134,7 +138,9 @@ app.post("/currentRequests", (request, response) => {
                 .get()
                 .then((results) => {
                     for (var i = 0; i < results.size; i++) {
-                        result.push(results.docs[i].data());
+                        var obj = results.docs[i].data();
+                        obj.uid = results.docs[i].id;
+                        result.push(obj);
                     }
                     response
                         .status(200)
@@ -168,7 +174,9 @@ app.post("/historyRequests", (request, response) => {
                 .get()
                 .then((results) => {
                     for (var i = 0; i < results.size; i++) {
-                        result.push(results.docs[i].data());
+                        var obj = results.docs[i].data();
+                        obj.uid = results.docs[i].id;
+                        result.push(obj);
                     }
                     response
                         .status(200)
@@ -188,7 +196,9 @@ app.post("/historyRequests", (request, response) => {
                 .get()
                 .then((results) => {
                     for (var i = 0; i < results.size; i++) {
-                        result.push(results.docs[i].data());
+                        var obj = results.docs[i].data();
+                        obj.uid = results.docs[i].id;
+                        result.push(obj);
                     }
                     response
                         .status(200)
@@ -208,7 +218,9 @@ app.post("/historyRequests", (request, response) => {
                 .get()
                 .then((results) => {
                     for (var i = 0; i < results.size; i++) {
-                        result.push(results.docs[i].data());
+                        var obj = results.docs[i].data();
+                        obj.uid = results.docs[i].id;
+                        result.push(obj);
                     }
                     response
                         .status(200)
@@ -242,7 +254,9 @@ app.post("/allPendingRequests", (request, response) => {
                 .get()
                 .then((results) => {
                     for (var i = 0; i < results.size; i++) {
-                        result.push(results.docs[i].data());
+                        var obj = results.docs[i].data();
+                        obj.uid = results.docs[i].id;
+                        result.push(obj);
                     }
                     response
                         .status(200)
@@ -261,7 +275,9 @@ app.post("/allPendingRequests", (request, response) => {
                 .get()
                 .then((results) => {
                     for (var i = 0; i < results.size; i++) {
-                        result.push(results.docs[i].data());
+                        var obj = results.docs[i].data();
+                        obj.uid = results.docs[i].id;
+                        result.push(obj);
                     }
                     response
                         .status(200)

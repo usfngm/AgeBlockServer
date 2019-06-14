@@ -32,8 +32,6 @@ var fb_app = firebase.initializeApp({
 });
 
 app.post("/login", (request, response) => {
-    console.log("RECIEVED REQ");
-    console.log(request.body);
     if (request.body.user) {
         var user = request.body.user;
         fb_app.auth().signInWithEmailAndPassword(user.email, user.password).then((responseUser) => {
@@ -55,8 +53,6 @@ app.post("/login", (request, response) => {
                         .status(400)
                         .send({ "msg": 'db_err' });
                 });
-            console.log("SUCCESS");
-
         }).catch((error) => {
             console.log("Error login:", error);
             if (error.code == 'auth/network-request-failed') {
@@ -79,9 +75,263 @@ app.post("/login", (request, response) => {
     }
 });
 
+// current
+// history
+// ALL / PENDING
+
+
+
+app.post("/currentRequests", (request, response) => {
+    if (request.body.user) {
+        var user = request.body.user;
+        var result = [];
+        var db = admin.firestore();
+        if (user.type == "parent") {
+            db
+                .collection("requests")
+                .where("parentID", "==", user.uid)
+                .where("status", "==", 2)
+                .get()
+                .then((results) => {
+                    for (var i = 0; i < results.size; i++) {
+                        result.push(results.docs[i].data());
+                    }
+                    response
+                        .status(200)
+                        .send({ "requests": result });
+                })
+                .catch((err) => {
+                    response
+                        .status(400)
+                        .send({ "msg": err });
+                });
+        }
+        else if (user.type == "elder") {
+            db
+                .collection("requests")
+                .where("elderID", "==", user.uid)
+                .where("status", "<", 3)
+                .get()
+                .then((results) => {
+                    for (var i = 0; i < results.size; i++) {
+                        result.push(results.docs[i].data());
+                    }
+                    response
+                        .status(200)
+                        .send({ "requests": result });
+                })
+                .catch((err) => {
+                    response
+                        .status(400)
+                        .send({ "msg": err });
+                });
+        }
+        else if (user.type == "volunteer") {
+            db
+                .collection("requests")
+                .where("volunteerID", "==", user.uid)
+                .where("status", "<=", 2)
+                .get()
+                .then((results) => {
+                    for (var i = 0; i < results.size; i++) {
+                        result.push(results.docs[i].data());
+                    }
+                    response
+                        .status(200)
+                        .send({ "requests": result });
+                })
+                .catch((err) => {
+                    response
+                        .status(400)
+                        .send({ "msg": err });
+                });
+        }
+    }
+    else {
+        console.log("FAIL PARAMETERS");
+        response
+            .status(400)
+            .send({ "msg": 'missing_params' });
+    }
+});
+
+app.post("/historyRequests", (request, response) => {
+    if (request.body.user) {
+        var user = request.body.user;
+        var result = [];
+        var db = admin.firestore();
+        if (user.type == "parent") {
+            db
+                .collection("requests")
+                .where("parentID", "==", user.uid)
+                .where("status", "==", 3)
+                .get()
+                .then((results) => {
+                    for (var i = 0; i < results.size; i++) {
+                        result.push(results.docs[i].data());
+                    }
+                    response
+                        .status(200)
+                        .send({ "requests": result });
+                })
+                .catch((err) => {
+                    response
+                        .status(400)
+                        .send({ "msg": err });
+                });
+        }
+        else if (user.type == "elder") {
+            db
+                .collection("requests")
+                .where("elderID", "==", user.uid)
+                .where("status", "==", 3)
+                .get()
+                .then((results) => {
+                    for (var i = 0; i < results.size; i++) {
+                        result.push(results.docs[i].data());
+                    }
+                    response
+                        .status(200)
+                        .send({ "requests": result });
+                })
+                .catch((err) => {
+                    response
+                        .status(400)
+                        .send({ "msg": err });
+                });
+        }
+        else if (user.type == "volunteer") {
+            db
+                .collection("requests")
+                .where("volunteerID", "==", user.uid)
+                .where("status", "==", 3)
+                .get()
+                .then((results) => {
+                    for (var i = 0; i < results.size; i++) {
+                        result.push(results.docs[i].data());
+                    }
+                    response
+                        .status(200)
+                        .send({ "requests": result });
+                })
+                .catch((err) => {
+                    response
+                        .status(400)
+                        .send({ "msg": err });
+                });
+        }
+    }
+    else {
+        console.log("FAIL PARAMETERS");
+        response
+            .status(400)
+            .send({ "msg": 'missing_params' });
+    }
+});
+
+app.post("/allPendingRequests", (request, response) => {
+    if (request.body.user) {
+        var user = request.body.user;
+        var result = [];
+        var db = admin.firestore();
+        if (user.type == "parent") {
+            db
+                .collection("requests")
+                .where("parentID", "==", user.uid)
+                .where("status", "==", 1)
+                .get()
+                .then((results) => {
+                    for (var i = 0; i < results.size; i++) {
+                        result.push(results.docs[i].data());
+                    }
+                    response
+                        .status(200)
+                        .send({ "requests": result });
+                })
+                .catch((err) => {
+                    response
+                        .status(400)
+                        .send({ "msg": err });
+                });
+        }
+        else if (user.type == "volunteer") {
+            db
+                .collection("requests")
+                .where("status", "==", 0)
+                .get()
+                .then((results) => {
+                    for (var i = 0; i < results.size; i++) {
+                        result.push(results.docs[i].data());
+                    }
+                    response
+                        .status(200)
+                        .send({ "requests": result });
+                })
+                .catch((err) => {
+                    response
+                        .status(400)
+                        .send({ "msg": err });
+                });
+        }
+    }
+    else {
+        console.log("FAIL PARAMETERS");
+        response
+            .status(400)
+            .send({ "msg": 'missing_params' });
+    }
+});
+
+app.post("/request", (request, response) => {
+    if (request.body.request) {
+        var elderRequest = request.body.request;
+        var db = admin.firestore();
+        console.log('what we got');
+        console.log(elderRequest);
+        if (elderRequest.uid) { // UPDATE
+            db
+                .collection("requests")
+                .doc(elderRequest.uid)
+                .set(elderRequest)
+                .then((doc) => {
+                    response
+                        .status(200)
+                        .send({ "request": elderRequest });
+                })
+                .catch((err) => {
+                    response
+                        .status(400)
+                        .send({ "msg": err.code });
+                })
+        }
+        else { // NEW
+            db
+                .collection("requests")
+                .add(elderRequest)
+                .then((doc) => {
+                    elderRequest.uid = doc.id;
+                    response
+                        .status(200)
+                        .send({ "request": elderRequest });
+                })
+                .catch((err) => {
+                    response
+                        .status(400)
+                        .send({ "msg": err.code });
+                })
+        }
+
+
+    }
+    else {
+        console.log("FAIL PARAMETERS");
+        response
+            .status(400)
+            .send({ "msg": 'missing_params' });
+    }
+});
+
 app.post("/getUser", (request, response) => {
-    console.log("RECIEVED REQ");
-    console.log(request.body);
     if (request.body.user) {
         var user = request.body.user;
         var db = admin.firestore();
@@ -123,7 +373,6 @@ app.post("/registerElder", (request, response) => {
                     .doc(user.uid)
                     .set(user)
                     .then(function () {
-                        console.log({ 'user': user });
                         db
                             .collection('users')
                             .doc(user.elder_parentID)
@@ -178,7 +427,6 @@ app.post("/register", (request, response) => {
                     .doc(user.uid)
                     .set(user)
                     .then(function () {
-                        console.log({ 'user': user });
                         response
                             .status(200)
                             .send({ 'user': user });
